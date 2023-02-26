@@ -54,7 +54,7 @@ wanted_features = ['chi-2_MR_AA','chi-3_MD_AA','Z-0_FA_AA','S-2_MD_AB','BO-1_MD_
 df=df[wanted_features]
 
 # Data splitting
-x_train, x_test, y_train, y_test = train_test_split(df, target, test_size=0.8, random_state=123)
+x_train, x_test, y_train, y_test = train_test_split(df, target, test_size=0.8, random_state=1233)
 y_train = y_train.to_numpy().reshape(len(y_train), 1)
 y_test = y_test.to_numpy().reshape(len(y_test), 1)
 x_train, x_test, y_train, y_test, y_scaler = transform_data(x_train, y_train, x_test, y_test, n_components=25, use_pca=False)
@@ -62,8 +62,8 @@ x_train = torch.from_numpy(x_train); x_test = torch.from_numpy(x_test)
 y_train = torch.from_numpy(y_train); y_test = torch.from_numpy(y_test)
 
 
-width = 186
-depth = 6
+width = 42
+depth = 1
 n_features = x_train.shape[-1]
 n_targets = 1
 model = MLP(n_features, n_targets, depth, width)
@@ -74,7 +74,7 @@ if torch.cuda.is_available():
     model = model.cuda()
 
 # Loss and optimizer
-lr = 1e-3
+lr = 0.0243
 criterion = torch.nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.5)

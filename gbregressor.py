@@ -18,13 +18,13 @@ df, target = load_data(data_path+gp, target)
 
 # Data splitting
 x_train, x_test, y_train, y_test = train_test_split(df, target, test_size=0.8, random_state=123)
-#y_train = y_train.to_numpy().reshape(len(y_train), 1)
-#y_test = y_test.to_numpy().reshape(len(y_test), 1)
-#x_train, x_test, y_train, y_test, y_scaler = transform_data(x_train, y_train, x_test, y_test, n_components=25, use_pca=False)
-#y_train = y_train.reshape(len(y_train)); y_test = y_test.reshape(len(y_test))
+y_train = y_train.to_numpy().reshape(len(y_train), 1)
+y_test = y_test.to_numpy().reshape(len(y_test), 1)
+x_train, x_test, y_train, y_test, y_scaler = transform_data(x_train, y_train, x_test, y_test, n_components=25, use_pca=False)
+y_train = y_train.reshape(len(y_train)); y_test = y_test.reshape(len(y_test))
 
 params = {
-    "n_estimators": 1500,
+    "n_estimators": 2000,
     "max_depth": 4,
     "min_samples_split": 5,
     "learning_rate": 0.01,
@@ -33,15 +33,19 @@ params = {
 
 reg = GradientBoostingRegressor(**params)
 reg.fit(x_train, y_train)
-reg.predict(x_test)
-print(reg.score(x_test, y_test))
 test_score = np.zeros((params["n_estimators"],), dtype=np.float64)
+r2_train = np.zeros((params["n_estimators"],), dtype=np.float64)
+r2_test = np.zeros((params["n_estimators"],), dtype=np.float64)
 for i, y_pred in enumerate(reg.staged_predict(x_test)):
     test_score[i] = mean_squared_error(y_test, y_pred)
+    r2_test[i] = r2_score(y_test, y_pred)
+
+for i, y_pred in enumerate(reg.staged_predict(x_train)):
+    r2_train[i] = r2_score(y_train, y_pred)
+
 
 fig = plt.figure(figsize=(6, 6))
 plt.subplot(1, 1, 1)
-plt.title("Deviance")
 plt.plot(
     np.arange(params["n_estimators"]) + 1,
     reg.train_score_,
@@ -57,8 +61,24 @@ plt.ylabel("Deviance")
 fig.tight_layout()
 plt.savefig(fig_path + "Deviance.pdf", format="pdf")
 
+fig = plt.figure(figsize=(6, 6))
+plt.subplot(1, 1, 1)
+plt.plot(
+    np.arange(params["n_estimators"]) + 1,
+    r2_train,
+    "b-",
+    label="Training Set R2",
+)
+plt.plot(
+    np.arange(params["n_estimators"]) + 1, r2_test, "r-", label="Test Set R2"
+)
+plt.legend(loc="lower right")
+plt.xlabel("Boosting Iterations")
+plt.ylabel("R2")
+fig.tight_layout()
+plt.savefig(fig_path + "R2.pdf", format="pdf")
+
 feature_importance = reg.feature_importances_
-print(reg.feature_importances_)
 sorted_idx = np.argsort(feature_importance)[-20:-1]
 pos = np.arange(sorted_idx.shape[0]) + 0.5
 fig = plt.figure(figsize=(12, 6))
@@ -68,7 +88,7 @@ plt.yticks(pos, np.array(df.columns)[sorted_idx])
 plt.title("Feature Importance (MDI)")
 
 result = permutation_importance(
-    reg, x_test, y_test, n_repeats=100, random_state=42, n_jobs=-1
+    reg, x_test, y_test, n_repeats=25, random_state=42, n_jobs=-1
 )
 sorted_idx = result.importances_mean.argsort()[-25:-1]
 plt.subplot(1, 2, 2)
