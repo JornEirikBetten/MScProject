@@ -35,6 +35,23 @@ nbo = "/nboVaska_vectors.csv"
 
 target = "target_barrier"
 df, target = load_data(data_path+gp, target)
+"""
+#wanted_features = ['Z-5_FS_AA','I-3_FD_AB','d-1_MR_BB','Z-0_FD_AB','Z-3_FR_AA','d-2_MA_BB',
+                   'BO-4_FA_BB','Z-1_FD_AB','d-1_MR_AB','Z-5_FD_AB','chi-0_MS_AB',
+                   'd-1_MD_BB','T-2_MR_AA','chi-2_MR_AA','Z-2_FR_AA','S-1_MS_AA',
+                   'd-1_MS_BBavg','S-1_MD_AA','S-1_MA_AA','chi-0_MD_AB','S-2_MR_AA',
+                   'I-0_MR_AB','Z-1_MR_AA','d-1_MA_BBavg','I-1_MD_AB','Z-1_MA_AA',
+                   'chi-1_MS_AA','chi-3_MD_AA','S-2_MD_AB','chi-0_FA_AB','T-6_FD_AB',
+                   'Z-2_MR_AA','chi-1_MR_AA','d-0_MR_AB','Z-0_FA_AA','d-1_MR_BBavg',
+                   'S-1_MR_AA','chi-1_MA_AA','I-2_MD_AB','d-0_MS_BBavg','BO-1_MD_BBavg',
+                   'S-0_MD_AB','BO-2_MD_BBavg','d-0_MA_BBavg','Z-1_FA_AA','BO-0_MR_AB',
+                   'Z-2_FA_AA','d-1_MD_BBavg','chi-1_MD_AA']
+"""
+wanted_features = ['chi-2_MR_AA','chi-3_MD_AA','Z-0_FA_AA','S-2_MD_AB','BO-1_MD_BBavg',
+                   'chi-1_MA_AA','I-1_MD_AB','S-1_MR_AA','BO-0_MR_AB','I-2_MD_AB',
+                   'd-0_MS_BBavg','d-0_MA_BBavg','chi-1_MR_AA','d-0_MR_AB','chi-1_MD_AA',
+                   'BO-2_MD_BBavg','Z-1_FA_AA','d-1_MD_BBavg','Z-2_FA_AA']
+df=df[wanted_features]
 
 # Data splitting
 x_train, x_test, y_train, y_test = train_test_split(df, target, test_size=0.8, random_state=123)
@@ -44,10 +61,12 @@ x_train, x_test, y_train, y_test, y_scaler = transform_data(x_train, y_train, x_
 x_train = torch.from_numpy(x_train); x_test = torch.from_numpy(x_test)
 y_train = torch.from_numpy(y_train); y_test = torch.from_numpy(y_test)
 
-layers = [50, 50]
+
+width = 186
+depth = 6
 n_features = x_train.shape[-1]
 n_targets = 1
-model = MLP(n_features, n_targets, layers)
+model = MLP(n_features, n_targets, depth, width)
 
 if torch.cuda.is_available():
     x_train = x_train.cuda(); x_test = x_test.cuda()

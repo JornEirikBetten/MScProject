@@ -6,40 +6,37 @@ torch.set_default_dtype(torch.float64)
 
 
 class MLP(torch.nn.Module):
-    def __init__(self, nfeatures, ntargets, layers):
+    def __init__(self, nfeatures, ntargets, depth, width):
         """
         nfeatures: int,
             number of features
         ntargets: int,
             number of targets
-        layers: list of ints,
-            len(layers) - number of layers
-            layer[i] - number of nodes in layer i
+        depth: int,
+            number of layers
+        width: int,
+            number of nodes in each layer
         """
         super(MLP, self).__init__()
-        nlayers = len(layers)
         self.nfeatures = nfeatures
         self.ntargets = ntargets
         self.layers = torch.nn.ModuleList([])
         self.relu = torch.nn.functional.relu
-        first_layer = torch.nn.Linear(nfeatures, layers[0])
+        first_layer = torch.nn.Linear(nfeatures, width)
         self.layers.append(first_layer)
-        if nlayers > 2:
-            for i in range(1, nlayers-1):
-                self.layers.append(torch.nn.Linear(layers[i-1], layers[i]))
-            self.layers.append(torch.nn.Linear(layers[-1], ntargets))
+        if depth > 2:
+            for i in range(1, depth-1):
+                self.layers.append(torch.nn.Linear(width, width))
+            self.layers.append(torch.nn.Linear(width, ntargets))
 
         else:
-            self.layers.append(torch.nn.Linear(layers[1], ntargets))
+            self.layers.append(torch.nn.Linear(width, ntargets))
 
-        print(f"Initiated MLP with {nlayers} layers:")
-        for i in range(nlayers):
-            print(f"Layer {i+1}: {layers[i]} nodes.")
+        #print(f"Initiated MLP with {depth} layers consisting of {width} nodes.")
 
     def forward(self, x):
         for i, l in enumerate(self.layers):
-            x = l(x)
-            x = self.relu(x)
+            x = self.relu(l(x))
         return x
 
 def train_and_test(x_train, x_test, y_train, y_test, epochs, model, criterion, optimizer, scheduler):
@@ -73,5 +70,5 @@ def train_and_test(x_train, x_test, y_train, y_test, epochs, model, criterion, o
 if __name__ == "__main__":
     layers = [2, 5, 6, 7]
     layers2 = [1, 2]
-    model1 = MLP(10, 1, layers)
-    model2 = MLP(10, 1, layers2)
+    model1 = MLP(10, 1, 5, 10)
+    model2 = MLP(10, 1, 5, 10)
