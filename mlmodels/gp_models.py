@@ -39,7 +39,7 @@ class FeatureExtractor(torch.nn.Sequential):
         self.add_module('relu1', torch.nn.ReLU())
         self.add_module('linear2', torch.nn.Linear(100, 50))
         self.add_module('relu2', torch.nn.ReLU())
-        self.add_module('linear3', torch.nn.Linear(50, n_features_out))
+        self.add_module('linear3', torch.nn.Linear(50, nfeatures_out))
 
 
 class NNKernel(gpytorch.models.ExactGP):

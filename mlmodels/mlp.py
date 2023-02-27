@@ -3,6 +3,7 @@ import torch
 import gpytorch
 import numpy as np
 from numpy.random import default_rng
+import tqdm
 from sklearn.metrics import r2_score
 torch.set_default_dtype(torch.float64)
 
@@ -47,7 +48,8 @@ def train_and_test(x_train, x_test, y_train, y_test, epochs, model, criterion, o
     r2_training = np.zeros(epochs)
     r2_testing = np.zeros(epochs)
     count = 0
-    for i in range(epochs):
+    iterator = tqdm.tqdm(range(epochs))
+    for i in iterator:
         model.train()
         output = model(x_train)
         loss = criterion(output, y_train)

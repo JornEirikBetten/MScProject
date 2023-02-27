@@ -78,7 +78,7 @@ fig.tight_layout()
 plt.savefig(fig_path + "R2.pdf", format="pdf")
 
 feature_importance = reg.feature_importances_
-sorted_idx = np.argsort(feature_importance)[-20:-1]
+sorted_idx = np.argsort(feature_importance)[-25:-1]
 pos = np.arange(sorted_idx.shape[0]) + 0.5
 fig = plt.figure(figsize=(12, 6))
 plt.subplot(1, 2, 1)
@@ -89,7 +89,7 @@ plt.title("Feature Importance (MDI)")
 result = permutation_importance(
     reg, x_test, y_test, n_repeats=25, random_state=42, n_jobs=-1
 )
-sorted_idx = result.importances_mean.argsort()[-25:-1]
+sorted_idx = result.importances_mean.argsort()[-101:-1]
 plt.subplot(1, 2, 2)
 plt.boxplot(
     result.importances[sorted_idx].T,
