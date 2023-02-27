@@ -47,4 +47,11 @@ def load_data(data_path, target):
     removals = ["metal_center_element", "metal_center_group", "metal_center_period","target_distance", "target_barrier", "target_angle", "id"]
     df = df.drop(columns=removals)
     df = df.dropna(axis=1)
-    return df, target_vector 
+    return df, target_vector
+
+
+def scale_features(xtrain, xtest):
+    xscaler = StandardScaler()
+    xtrain_scaled = xscaler.fit_transform(xtrain)
+    xtest_scaled = xscaler.transform(xtest)
+    return xtrain_scaled, xtest_scaled

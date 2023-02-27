@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np
 import os
-from data_preprocessing import transform_data, load_data
+from data_preprocessing import transform_data, load_data, scale_features
 import matplotlib.pyplot as plt
 from sklearn.inspection import permutation_importance
 from sklearn.metrics import mean_squared_error, r2_score
@@ -17,14 +17,13 @@ target = "target_barrier"
 df, target = load_data(data_path+gp, target)
 
 # Data splitting
-x_train, x_test, y_train, y_test = train_test_split(df, target, test_size=0.8, random_state=123)
-y_train = y_train.to_numpy().reshape(len(y_train), 1)
-y_test = y_test.to_numpy().reshape(len(y_test), 1)
-x_train, x_test, y_train, y_test, y_scaler = transform_data(x_train, y_train, x_test, y_test, n_components=25, use_pca=False)
-y_train = y_train.reshape(len(y_train)); y_test = y_test.reshape(len(y_test))
+x_train, x_test, y_train, y_test = train_test_split(df, target, test_size=0.1, random_state=123)
+x_train, x_test = scale_features(x_train, x_test)
+#x_train, x_test, y_train, y_test, y_scaler = transform_data(x_train, y_train, x_test, y_test, n_components=25, use_pca=False)
+
 
 params = {
-    "n_estimators": 2000,
+    "n_estimators": 2500,
     "max_depth": 4,
     "min_samples_split": 5,
     "learning_rate": 0.01,
