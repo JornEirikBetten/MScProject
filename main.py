@@ -54,7 +54,7 @@ wanted_features = ['chi-2_MR_AA','chi-3_MD_AA','Z-0_FA_AA','S-2_MD_AB','BO-1_MD_
                    'd-0_MS_BBavg','d-0_MA_BBavg','chi-1_MR_AA','d-0_MR_AB','chi-1_MD_AA',
                    'BO-2_MD_BBavg','Z-1_FA_AA','d-1_MD_BBavg','Z-2_FA_AA']
 """
-df=df[wanted_features]
+#df=df[wanted_features]
 
 # Data splitting
 x_train, x_test, y_train, y_test = train_test_split(df, target, test_size=0.2, random_state=1233)
@@ -66,8 +66,8 @@ x_train = torch.from_numpy(x_train); x_test = torch.from_numpy(x_test)
 y_train = torch.from_numpy(y_train); y_test = torch.from_numpy(y_test)
 
 
-width = 247
-depth = 4
+width = 319
+depth = 3
 n_features = x_train.shape[-1]
 n_targets = 1
 print(f"Running on {n_features}/1030 features.")
@@ -79,7 +79,7 @@ if torch.cuda.is_available():
     model = model.cuda()
 
 # Loss and optimizer
-lr = 1e-3
+lr = 0.0043
 criterion = torch.nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.5)

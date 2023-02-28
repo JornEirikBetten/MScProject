@@ -11,7 +11,7 @@ from plotter_functions import plot_lineplot
 import time
 from numpy.random import default_rng
 
-def objective(depth, width):
+def objective(learning_rate, depth, width):
     fig_path = os.getcwd() + "/results/figures/"
     data_path = "/home/jeb/Documents/MScProject/Project/datasets/data_Vaska"
     gp = "/gpVaska_vectors.csv"
@@ -52,9 +52,9 @@ def objective(depth, width):
     model = MLP(n_features, n_targets, int(depth), int(width))
 
     # Loss
-    criterion = torch.nn.L1Loss()
+    criterion = torch.nn.MSELoss()
     # Define the optimizer with the given learning rate
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
     # Training
     rng = default_rng()
@@ -82,21 +82,23 @@ from bayes_opt import UtilityFunction
 
 # Define the search space for the hyperparameters
 pbounds = {'depth': (1, 5),
-           'width': (32, 256)}
+           'width': (32, 512),
+           'learning_rate': (1e-4, 1e-2),
+           }
 
 
 # Define the Gaussian process regression model for the Bayesian optimization
 optimizer = BayesianOptimization(
     f=objective,
     pbounds=pbounds,
-    random_state=42,
+    random_state=123,
 )
 
 # Define the number of iterations for Bayesian optimization
 num_iterations = 10
 
 # Define the utility function to use (Expected Improvement)
-utility = UtilityFunction(kind="poi", xi=0.0, kappa_decay=1.0)
+utility = UtilityFunction(kind="ei", xi=0.0, kappa_decay=1.0)
 
 
 
@@ -118,4 +120,4 @@ print(f"Final result:")
 print(f"    loss={optimizer.max['target']:.4f}")
 print(f"    depth={int(optimizer.max['params']['depth'])}")
 print(f"    width={int(optimizer.max['params']['width'])}")
-#print(f"    learning_rate={optimizer.max['params']['learning_rate']:.4f}")
+print(f"    learning_rate={optimizer.max['params']['learning_rate']:.4f}")
